@@ -2,22 +2,37 @@
 @model WorkoutsModel
 @{
     ViewData["Title"] = "Готовые тренировки";
+    var difficultyParam = (Request.Query["difficulty"].FirstOrDefault() ?? "all").ToString();
+    var showDetails = (Request.Query["details"].FirstOrDefault() ?? "0") == "1";
+    string BuildQuery(string diff, bool details)
+    {
+        var d = diff == "all" ? "all" : diff;
+        return $"?difficulty={d}&details={(details ? 1 : 0)}";
+    }
 }
-<div class="text-center mb-4 hero">
+<div class="mb-4 text-center">
     <h2 class="mb-1"><span class="bi bi-dumbbell me-2"></span>Готовые тренировки</h2>
-    <p class="lead muted">Найдите тренировку по уровню сложности и цели — просматривать можно без входа, чтобы выбрать нужно войти.</p>
+    <p class="lead muted mb-0">Найдите тренировку по уровню сложности и цели — просматривать можно без входа, чтобы выбрать нужно войти.</p>
 </div>
 
 <div class="mb-3 mx-auto" style="max-width:900px;">
-    <form method="get" class="d-flex gap-2" aria-label="Фильтр по сложности">
-        @{ var sel = (Request.Query["difficulty"].FirstOrDefault() ?? "all").ToString(); }
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-center workouts-filters" aria-label="Фильтр по сложности и поиск">
+        @{ var sel = difficultyParam; }
         <select name="difficulty" class="form-select difficulty-select" aria-label="Выбор сложности">
             <option value="all" selected="@(sel=="all")">Все уровни</option>
             <option value="easy" selected="@(sel=="easy")">Лёгкие</option>
             <option value="medium" selected="@(sel=="medium")">Средние</option>
             <option value="hard" selected="@(sel=="hard")">Интенсивные</option>
         </select>
+        <input type="hidden" name="details" value="@(showDetails ? 1 : 0)" />
+        <div class="flex-grow-1 position-relative">
+            <input type="text" class="form-control search-input" placeholder="Поиск по названию или описанию" aria-label="Поиск тренировок" />
+            <span class="search-clear" role="button" aria-label="Очистить поиск" title="Очистить">×</span>
+        </div>
         <button class="btn btn-outline-primary" aria-label="Применить фильтр">Фильтровать</button>
+        <a class="btn btn-outline-secondary details-toggle" href="@BuildQuery(sel, !showDetails)" aria-label="@(showDetails ? "Скрыть упражнения" : "Показать упражнения")">
+            @(showDetails ? "Скрыть упражнения" : "Показать упражнения")
+        </a>
     </form>
 </div>
 
@@ -25,18 +40,94 @@
 {
     <div class="alert alert-info">Пока нет доступных тренировок.</div>
 }
-else
-{
-    <div class="grid-cards mb-4">
-        @foreach(var split in Model.Splits)
+else {
+    var total = Model.Splits.Count();
+    var easy = Model.Splits.Count(s => s.Difficulty == Domain.Entities.Difficulty.Easy);
+    var medium = Model.Splits.Count(s => s.Difficulty == Domain.Entities.Difficulty.Medium);
+    var hard = Model.Splits.Count(s => s.Difficulty == Domain.Entities.Difficulty.Hard);
+    <div class="row g-3 mb-4 stat-panels" aria-label="Сводка по сложности">
+        <div class="col-6 col-md-4">
+            <div class="custom-card h-100 small d-flex flex-column justify-content-center text-center border-0 shadow-sm" style="background:linear-gradient(135deg,#bbf7d0,#ecfdf5);">
+                <div class="fw-semibold text-success">Лёгкие</div>
+                <div class="fs-5 fw-bold">@easy</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="custom-card h-100 small d-flex flex-column justify-content-center text-center border-0 shadow-sm" style="background:linear-gradient(135deg,#fde68a,#fff7ed);">
+                <div class="fw-semibold text-warning">Средние</div>
+                <div class="fs-5 fw-bold">@medium</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="custom-card h-100 small d-flex flex-column justify-content-center text-center border-0 shadow-sm" style="background:linear-gradient(135deg,#fca5a5,#fff1f2);">
+                <div class="fw-semibold text-danger">Интенсивные</div>
+                <div class="fs-5 fw-bold">@hard</div>
+            </div>
+        </div>
+    </div>
+    <div class="improved-workouts-grid mb-4" aria-label="Список тренировок">
+        @foreach (var split in Model.Splits)
         {
-            @await Html.PartialAsync("~/Pages/Shared/_SplitCard.cshtml", new Web.Models.SplitCardModel {
-                Split = split,
-                ShowExercises = false,
-                ActionType = Web.Models.SplitCardActionType.MarkInHistory,
-                IsAuthenticated = HttpContext.Session.GetInt32("UserId") != null,
-                PostUrl = "/Workouts"
-            })
+            <div class="iwg-item">
+                @await Html.PartialAsync("~/Pages/Shared/_SplitCard.cshtml", new Web.Models.SplitCardModel {
+                    Split = split,
+                    ShowExercises = showDetails,
+                    ActionType = Web.Models.SplitCardActionType.MarkInHistory,
+                    IsAuthenticated = HttpContext.Session.GetInt32("UserId") != null,
+                    PostUrl = "/Workouts"
+                })
+            </div>
         }
     </div>
 }
+
+<script>
+// Persist and restore the "show details" (exercises) toggle using localStorage.
+(function(){
+    const LS_KEY = 'workoutsShowDetails';
+    const params = new URLSearchParams(window.location.search);
+    const hasParam = params.has('details');
+    if(!hasParam){
+        const stored = localStorage.getItem(LS_KEY);
+        if(stored === '1'){
+            params.set('details','1');
+            if(!params.has('difficulty')) params.set('difficulty','@difficultyParam');
+            const newQs = params.toString();
+            if(newQs !== window.location.search.substring(1)){
+                window.location.search = newQs;
+                return;
+            }
+        }
+    }
+    document.addEventListener('click', function(e){
+        const a = e.target.closest('a.details-toggle');
+        if(!a) return;
+        try {
+            const url = new URL(a.getAttribute('href'), window.location.origin);
+            localStorage.setItem(LS_KEY, url.searchParams.get('details') || '0');
+        } catch{}
+    });
+})();
+
+// Client-side search/filter for workout cards (grid version)
+(function(){
+    const input = document.querySelector('.workouts-filters .search-input');
+    if(!input) return; const clearBtn = document.querySelector('.workouts-filters .search-clear');
+    const cards = Array.from(document.querySelectorAll('.workouts-grid .split-card'));
+    let lastTerm='';
+    const norm = s => (s||'').toLowerCase().trim();
+    function apply(){
+        const term = norm(input.value); if(term===lastTerm) return; lastTerm=term; let visible=0;
+        cards.forEach(card=>{ const wrap = card.closest('.grid-item'); if(!wrap) return; const match=!term||norm(card.innerText).includes(term); wrap.style.display=match?'':'none'; if(match) visible++; });
+        let emptyMsg = document.getElementById('no-search-results');
+        if(!emptyMsg){ emptyMsg=document.createElement('div'); emptyMsg.id='no-search-results'; emptyMsg.className='alert alert-warning mt-3'; emptyMsg.style.display='none'; (document.querySelector('.workouts-grid')||document.body).after(emptyMsg); }
+        emptyMsg.textContent='Ничего не найдено по запросу "'+term+'"';
+        emptyMsg.style.display = (term && visible===0)?'':'none';
+        localStorage.setItem('workoutsSearchTerm', term);
+        clearBtn.style.display = term? 'block':'none';
+    }
+    input.addEventListener('input', apply);
+    clearBtn.addEventListener('click', ()=>{ input.value=''; input.focus(); apply(); });
+    const stored = localStorage.getItem('workoutsSearchTerm'); if(stored){ input.value=stored; apply(); }
+})();
+</script>

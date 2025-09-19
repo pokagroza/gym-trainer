@@ -59,6 +59,68 @@ body{
 .badge-medium{background:#fde68a;color:#92400e}
 .badge-hard{background:#fca5a5;color:#7f1d1d}
 
+/* Search bar styles */
+.workouts-filters .search-input{padding-left:2.1rem}
+.workouts-filters .search-input:focus{box-shadow:0 0 0 3px rgba(37,99,235,0.15);}
+.workouts-filters .search-clear{position:absolute;right:.65rem;top:50%;transform:translateY(-50%);cursor:pointer;display:none;color:var(--muted);font-weight:600;font-size:1rem;line-height:1;}
+.workouts-filters .search-clear:hover{color:#0f172a}
+
+/* Completed exercise styling (future checkboxes) */
+.exercise-completed{text-decoration:line-through;opacity:.55}
+li .exercise-item{cursor:pointer;user-select:none}
+li .exercise-item .exercise-name{transition:color .25s ease, opacity .25s ease}
+li .exercise-item input[type=checkbox]{cursor:pointer}
+li .exercise-item input[type=checkbox]:focus{outline:2px solid var(--accent);outline-offset:2px}
+li .exercise-item .exercise-completed{color:#64748b}
+
+/* Smooth fade for cards when filtered */
+.split-card{transition:opacity .25s ease, transform .25s ease}
+.split-card[style*='display: none']{opacity:0}
+
+/* Uniform workouts grid */
+.workouts-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-items:stretch}
+.workouts-grid .grid-item{display:flex}
+.workouts-grid .grid-item > .split-card{width:100%}
+.workouts-grid-wrapper{max-width:1080px;margin:0 auto}
+@media (min-width:1200px){
+  .workouts-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));}
+}
+/* Flex alternative layout */
+.workouts-flex-wrapper{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;max-width:1200px;margin:0 auto}
+.workouts-flex-wrapper .workout-flex-card{flex:1 1 260px;max-width:300px;display:flex}
+.workouts-flex-wrapper .workout-flex-card .split-card{width:100%}
+
+/* Improved uniform grid (replaces flex) */
+.improved-workouts-grid{--card-min:270px;--card-max:310px;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));gap:1.15rem;max-width:1200px;margin:0 auto;align-items:stretch}
+.improved-workouts-grid .iwg-item{display:flex}
+.improved-workouts-grid .iwg-item > .split-card{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.workout-card-enhanced{transition:box-shadow .25s ease, transform .25s ease;border:1px solid var(--muted-border);background:linear-gradient(180deg,#ffffff,#f8fafc)}
+.workout-card-enhanced:hover{box-shadow:0 10px 28px rgba(15,23,42,0.12);transform:translateY(-4px)}
+.workout-card-enhanced h6{font-weight:600;letter-spacing:.3px}
+.workout-card-enhanced p{font-size:.85rem;line-height:1.35}
+.workout-card-enhanced .difficulty-badge{font-weight:600}
+.workout-card-enhanced form .btn, .workout-card-enhanced a.btn{margin-top:.35rem}
+.workout-card-enhanced ul.exercise-list{max-height:170px;overflow:auto;padding-right:4px}
+.workout-card-enhanced ul.exercise-list::-webkit-scrollbar{width:6px}
+.workout-card-enhanced ul.exercise-list::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:10px}
+.workout-card-enhanced .exercise-instructions{font-size:.7rem}
+.improved-workouts-grid .iwg-item:nth-child(odd) .workout-card-enhanced{background:linear-gradient(180deg,#ffffff,#f1f5f9)}
+.improved-workouts-grid .iwg-item:nth-child(even) .workout-card-enhanced{background:linear-gradient(180deg,#ffffff,#f3f4f6)}
+.improved-workouts-grid .iwg-item .workout-card-enhanced:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 0,rgba(37,99,235,0.08),transparent 60%);pointer-events:none;opacity:.55}
+
+@media (min-width:1400px){
+  .improved-workouts-grid{grid-template-columns:repeat(auto-fill,minmax(var(--card-max),1fr));}
+}
+@media (max-width:640px){
+  .improved-workouts-grid{--card-min:230px;gap:.85rem}
+  .workout-card-enhanced ul.exercise-list{max-height:150px}
+}
+
+/* Stat panels responsiveness tweak */
+@media (max-width:575px){
+  .stat-panels .custom-card{padding:.75rem}
+}
+
 .range-control{display:flex;align-items:center;gap:12px}
 .range-control input[type="range"]{width:100%;height:6px;background:linear-gradient(90deg,var(--accent) 0%, rgba(15,23,42,0.06) 100%);border-radius:6px}
 .range-control input[type="range"]::-webkit-slider-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,0.08)}

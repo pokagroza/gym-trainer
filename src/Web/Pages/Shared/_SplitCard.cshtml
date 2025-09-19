@@ -4,16 +4,31 @@
     var diffClass = split.Difficulty == Domain.Entities.Difficulty.Easy ? "badge-easy" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "badge-medium" : "badge-hard");
     var diffText = split.Difficulty == Domain.Entities.Difficulty.Easy ? "Лёгкий" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "Средний" : "Интенсивный");
 }
-<div class="split-card custom-card h-100 d-flex flex-column">
+<div class="split-card custom-card h-100 d-flex flex-column workout-card-enhanced">
     <h6 class="mb-1">@split.Name</h6>
     <div class="mb-2"><span class="badge difficulty-badge @diffClass">@diffText</span></div>
     <p class="muted small flex-grow-0">@split.Description</p>
     @if (Model.ShowExercises && split.Exercises?.Any() == true)
     {
-        <ul class="small mb-2 flex-grow-1">
-            @foreach(var ex in split.Exercises.Take(Model.ExercisePreviewCount))
+        <ul class="small mb-2 flex-grow-1 list-unstyled exercise-list" data-split-id="@split.Id">
+            @foreach(var se in split.Exercises.Take(Model.ExercisePreviewCount))
             {
-                <li>@ex.Exercise.Name — @ex.Sets x @ex.Reps</li>
+                var eid = $"ex-{split.Id}-{se.ExerciseId}";
+                <li class="mb-1">
+                    <label class="exercise-item d-flex align-items-start gap-1">
+                        <input type="checkbox" class="form-check-input mt-1 exercise-complete" data-ex-id="@se.ExerciseId" aria-label="Отметить выполнение упражнения @se.Exercise.Name" />
+                        <span class="flex-grow-1">
+                            <span class="fw-semibold exercise-name">@se.Exercise.Name</span>
+                            <span class="text-muted"> — @se.Sets x @se.Reps</span>
+                        </span>
+                    </label>
+                    <button type="button" class="btn btn-link p-0 ms-1 small text-decoration-none exercise-info-toggle" data-target="#@eid" aria-expanded="false" aria-controls="@eid">ⓘ</button>
+                    <div id="@eid" class="exercise-instructions collapse mt-1">
+                        <div class="p-2 rounded border bg-light small" style="--bs-bg-opacity:.6;">
+                            @(string.IsNullOrWhiteSpace(se.Exercise.Instructions) ? "Инструкция скоро будет." : se.Exercise.Instructions)
+                        </div>
+                    </div>
+                </li>
             }
         </ul>
     }
@@ -57,4 +72,63 @@
                 break;
         }
     </div>
-</div>
+ </div>
+<!-- Removed stray extra closing div that caused layout break -->
+<script>
+document.currentScript && (function(){
+    // Delegate only once per page for performance
+    if(window.__splitCardEnhancementsBound) return; window.__splitCardEnhancementsBound = true;
+    // Info toggles
+    document.addEventListener('click', function(e){
+        const btn = e.target.closest('.exercise-info-toggle');
+        if(btn){
+            const sel = btn.getAttribute('data-target');
+            const el = document.querySelector(sel);
+            if(!el) return;
+            const isOpen = el.classList.contains('show');
+            if(typeof bootstrap === 'undefined'){
+                if(isOpen){ el.classList.remove('show'); el.style.display='none'; btn.setAttribute('aria-expanded','false'); }
+                else { el.classList.add('show'); el.style.display='block'; btn.setAttribute('aria-expanded','true'); }
+            } else {
+                const c = bootstrap.Collapse.getOrCreateInstance(el, { toggle:false });
+                isOpen ? c.hide() : c.show();
+                btn.setAttribute('aria-expanded', (!isOpen).toString());
+            }
+        }
+    });
+    // Completion persistence (localStorage)
+    const LS_KEY = 'splitExerciseCompletion';
+    function loadState(){
+        try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch{ return {}; }
+    }
+    function saveState(data){
+        try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch{}
+    }
+    const state = loadState();
+    // Initialize from state
+    document.querySelectorAll('.exercise-list').forEach(list=>{
+        const splitId = list.getAttribute('data-split-id');
+        const splitState = state[splitId] || {};
+        list.querySelectorAll('.exercise-complete').forEach(chk=>{
+            const exId = chk.getAttribute('data-ex-id');
+            if(splitState[exId]){
+                chk.checked = true;
+                chk.closest('li').querySelector('.exercise-name').classList.add('exercise-completed');
+            }
+        });
+    });
+    // Change handler
+    document.addEventListener('change', function(e){
+        const chk = e.target.closest('.exercise-complete');
+        if(!chk) return;
+        const list = chk.closest('.exercise-list');
+        if(!list) return;
+        const splitId = list.getAttribute('data-split-id');
+        const exId = chk.getAttribute('data-ex-id');
+        state[splitId] = state[splitId] || {};
+        if(chk.checked){ state[splitId][exId] = 1; chk.closest('li').querySelector('.exercise-name').classList.add('exercise-completed'); }
+        else { delete state[splitId][exId]; chk.closest('li').querySelector('.exercise-name').classList.remove('exercise-completed'); }
+        saveState(state);
+    });
+})();
+</script>
