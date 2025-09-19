@@ -8,8 +8,8 @@ namespace Web.Controllers
     [Route("api/[controller]")]
     public class TrainingController : ControllerBase
     {
-        private readonly TrainingOptimizerService _optimizerService;
-        public TrainingController(TrainingOptimizerService optimizerService)
+        private readonly ITrainingOptimizerService _optimizerService;
+        public TrainingController(ITrainingOptimizerService optimizerService)
         {
             _optimizerService = optimizerService;
         }
@@ -53,6 +53,43 @@ namespace Web.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Ошибка при оптимизации по параметрам: {ex.Message}");
+            }
+        }
+
+        // Returns multiple optimized suggestions based on parameters
+        [HttpGet("suggestions")]
+        public IActionResult Suggestions([FromQuery] int fatigue, [FromQuery] int experience, [FromQuery] string? difficulty, [FromQuery] int limit = 3)
+        {
+            try
+            {
+                if (limit <= 0) limit = 1;
+                if (limit > 10) limit = 10; // sanity cap
+                var list = _optimizerService.GetOptimizedSplitsByParams(fatigue, experience, difficulty, limit);
+                // Project to DTO to avoid circular references (TrainingSplit -> SplitExercise -> TrainingSplit)
+                var dto = list.Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    s.Description,
+                    Difficulty = s.Difficulty.ToString(),
+                    Exercises = (s.Exercises == null
+                        ? new List<object>()
+                        : s.Exercises.Select(se => (object)new
+                        {
+                            se.Id,
+                            se.Sets,
+                            se.Reps,
+                            ExerciseId = se.ExerciseId,
+                            ExerciseName = se.Exercise.Name,
+                            se.Exercise.MuscleGroup,
+                            se.Exercise.Equipment
+                        }).ToList())
+                });
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при получении предложений: {ex.Message}\n{ex.StackTrace}");
             }
         }
     }

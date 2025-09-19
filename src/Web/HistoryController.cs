@@ -8,8 +8,8 @@ namespace Web.Controllers
     [Route("api/[controller]")]
     public class HistoryController : ControllerBase
     {
-        private readonly TrainingHistoryService _historyService;
-        public HistoryController(TrainingHistoryService historyService)
+        private readonly ITrainingHistoryService _historyService;
+        public HistoryController(ITrainingHistoryService historyService)
         {
             _historyService = historyService;
         }

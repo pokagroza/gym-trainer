@@ -7,10 +7,10 @@ using System.Linq;
 
 public class HistoryModel : PageModel
 {
-    private readonly TrainingHistoryService _historyService;
+    private readonly ITrainingHistoryService _historyService;
     public List<TrainingHistory>? History { get; set; }
 
-    public HistoryModel(TrainingHistoryService historyService)
+    public HistoryModel(ITrainingHistoryService historyService)
     {
         _historyService = historyService;
     }

@@ -29,6 +29,19 @@
         /* quick responsive container
          (ensures main content isn't full-width if Bootstrap missing) */
         .container.py-4 { padding-left:1rem; padding-right:1rem; }
+        /* Active nav state */
+        .nav-link.active { position:relative; font-weight:600; color:#0d6efd !important; }
+        .nav-link.active::after { content:""; position:absolute; left:8px; right:8px; bottom:4px; height:3px; background: linear-gradient(90deg,#0d6efd,#6f42c1); border-radius:2px; }
+        /* Page fade transition */
+        .page-transition { opacity:0; transform:translateY(6px); transition: opacity .35s ease, transform .35s ease; }
+        .page-transition.ready { opacity:1; transform:translateY(0); }
+        /* Smooth hover for nav */
+        .navbar .nav-link { transition: color .2s ease; }
+        .navbar .nav-link:hover { color:#0b5ed7; }
+        html[data-theme='dark'] body { background:#101418 !important; color:#e2e8f0 !important; }
+        html[data-theme='dark'] .custom-card { background:#1c2430 !important; box-shadow:0 2px 6px rgba(0,0,0,.6) !important; }
+        html[data-theme='dark'] .navbar { background:#18202a !important; }
+        html[data-theme='dark'] .nav-link.active { color:#66b2ff !important; }
     </style>
 </head>
 <body>
@@ -65,7 +78,9 @@
         </div>
     </nav>
     <div class="container py-4">
-        @RenderBody()
+        <div id="page-wrapper" class="page-transition">
+            @RenderBody()
+        </div>
     </div>
     <!-- Bootstrap bundle: try CDN first, fallback to local bundle if needed -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="" crossorigin="anonymous"></script>
@@ -111,6 +126,28 @@
                     // initial label
                     btn.textContent = root.getAttribute('data-theme') === 'dark' ? 'Светлая' : 'Тёмная';
                 }
+            } catch(e) { /* ignore */ }
+        })();
+
+        // Active nav highlight + page fade-in after first paint
+        (function(){
+            try {
+                var path = window.location.pathname.toLowerCase();
+                document.querySelectorAll('.navbar .nav-link').forEach(function(a){
+                    var href = a.getAttribute('href');
+                    if(!href) return;
+                    // Normalize (treat '/' and '/Index')
+                    var normalized = href.toLowerCase();
+                    if (normalized === '/' && (path === '/' || path === '/index')) {
+                        a.classList.add('active');
+                    } else if (normalized !== '/' && path.startsWith(normalized)) {
+                        a.classList.add('active');
+                    }
+                });
+                var wrapper = document.getElementById('page-wrapper');
+                requestAnimationFrame(function(){
+                    if(wrapper) wrapper.classList.add('ready');
+                });
             } catch(e) { /* ignore */ }
         })();
     </script>

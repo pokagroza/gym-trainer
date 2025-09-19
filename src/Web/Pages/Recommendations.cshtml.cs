@@ -7,10 +7,10 @@ using System.Linq;
 
 public class RecommendationsModel : PageModel
 {
-    private readonly RecommendationService _recommendationService;
+    private readonly IRecommendationService _recommendationService;
     public List<Exercise>? Exercises { get; set; }
 
-    public RecommendationsModel(RecommendationService recommendationService)
+    public RecommendationsModel(IRecommendationService recommendationService)
     {
         _recommendationService = recommendationService;
     }

@@ -6,14 +6,17 @@
 <div class="text-center mb-4">
     <h2 class="mb-3"><span class="bi bi-box-arrow-in-right me-2"></span>Вход</h2>
 </div>
-<form method="post" class="card p-4 mb-4 shadow-sm mx-auto custom-card" style="max-width: 400px;">
+<form method="post" class="card p-4 mb-4 shadow-sm mx-auto custom-card" style="max-width: 400px;" novalidate>
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
     <div class="mb-3">
         <label class="form-label">Логин:</label>
-        <input asp-for="Username" class="form-control" required />
+        <input asp-for="Username" class="form-control" />
+        <span class="text-danger small" asp-validation-for="Username"></span>
     </div>
     <div class="mb-3">
         <label class="form-label">Пароль:</label>
-        <input asp-for="Password" type="password" class="form-control" required />
+        <input asp-for="Password" type="password" class="form-control" />
+        <span class="text-danger small" asp-validation-for="Password"></span>
     </div>
     <button type="submit" class="btn btn-primary w-100"><span class="bi bi-box-arrow-in-right"></span> Войти</button>
 </form>

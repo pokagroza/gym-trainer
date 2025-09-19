@@ -7,8 +7,8 @@ namespace Web.Controllers
     [Route("api/[controller]")]
     public class RecommendationController : ControllerBase
     {
-        private readonly RecommendationService _service;
-        public RecommendationController(RecommendationService service)
+        private readonly IRecommendationService _service;
+        public RecommendationController(IRecommendationService service)
         {
             _service = service;
         }

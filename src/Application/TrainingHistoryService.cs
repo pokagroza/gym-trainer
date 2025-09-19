@@ -1,35 +1,38 @@
-using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
-namespace Application.Services
+namespace Application.Services;
+
+public interface ITrainingHistoryService
 {
-    public class TrainingHistoryService
+    void AddHistory(int userId, int splitId, string notes);
+    IEnumerable<Domain.Entities.TrainingHistory> GetUserHistory(int userId);
+}
+
+public class TrainingHistoryService : ITrainingHistoryService
+{
+    private readonly GymDbContext _context;
+    public TrainingHistoryService(GymDbContext context) => _context = context;
+
+    public void AddHistory(int userId, int splitId, string notes)
     {
-        private readonly GymDbContext _context;
-        public TrainingHistoryService(GymDbContext context)
+        var history = new Domain.Entities.TrainingHistory
         {
-            _context = context;
-        }
+            UserId = userId,
+            TrainingSplitId = splitId,
+            Date = DateTime.UtcNow,
+            Notes = notes
+        };
+        _context.TrainingHistories.Add(history);
+        _context.SaveChanges();
+    }
 
-        public void AddHistory(int userId, int splitId, string notes)
-        {
-            var history = new TrainingHistory
-            {
-                UserId = userId,
-                TrainingSplitId = splitId,
-                Date = DateTime.UtcNow,
-                Notes = notes
-            };
-            _context.TrainingHistories.Add(history);
-            _context.SaveChanges();
-        }
-
-        public IEnumerable<TrainingHistory> GetUserHistory(int userId)
-        {
-            return _context.TrainingHistories
-                .Where(h => h.UserId == userId)
-                .OrderByDescending(h => h.Date)
-                .ToList();
-        }
+    public IEnumerable<Domain.Entities.TrainingHistory> GetUserHistory(int userId)
+    {
+        return _context.TrainingHistories
+            .Where(h => h.UserId == userId)
+            .OrderByDescending(h => h.Date)
+            .AsNoTracking()
+            .ToList();
     }
 }

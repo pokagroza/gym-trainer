@@ -55,20 +55,14 @@ else
             @foreach (var s in Model.Suggestions)
             {
                 <div class="col-md-4">
-                    <div class="custom-card p-3">
-                        <h6 class="mb-1">@s.Name</h6>
-                        <p class="muted small">@s.Description</p>
-                        <ul class="small mb-2">
-                            @foreach (var ex in s.Exercises.Take(4))
-                            {
-                                <li>@ex.Exercise.Name — @ex.Sets x @ex.Reps</li>
-                            }
-                        </ul>
-                        <form method="post" asp-page-handler="Select">
-                            <input type="hidden" name="SelectedSplitId" value="@s.Id" />
-                            <button class="btn btn-outline-secondary btn-sm w-100" type="submit">Выбрать этот сплит</button>
-                        </form>
-                    </div>
+                    @await Html.PartialAsync("~/Pages/Shared/_SplitCard.cshtml", new Web.Models.SplitCardModel {
+                        Split = s,
+                        ShowExercises = true,
+                        ExercisePreviewCount = 4,
+                        ActionType = Web.Models.SplitCardActionType.SelectSplit,
+                        IsAuthenticated = Model.HttpContext.Session.GetInt32("UserId") != null,
+                        PostHandler = "Select"
+                    })
                 </div>
             }
         </div>

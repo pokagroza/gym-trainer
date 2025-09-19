@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 public class WorkoutsModel : PageModel
 {
-    private readonly TrainingOptimizerService _optimizerService;
-    private readonly TrainingHistoryService _historyService;
+    private readonly ITrainingOptimizerService _optimizerService;
+    private readonly ITrainingHistoryService _historyService;
     public List<TrainingSplit>? Splits { get; set; }
 
-    public WorkoutsModel(TrainingOptimizerService optimizerService, TrainingHistoryService historyService)
+    public WorkoutsModel(ITrainingOptimizerService optimizerService, ITrainingHistoryService historyService)
     {
         _optimizerService = optimizerService;
         _historyService = historyService;

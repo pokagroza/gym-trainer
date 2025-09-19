@@ -2,13 +2,11 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Application.Services;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Infrastructure.Persistence;
 
 public class OptimizeModel : PageModel
 {
-    private readonly TrainingOptimizerService _optimizerService;
-    private readonly TrainingHistoryService _historyService;
+    private readonly ITrainingOptimizerService _optimizerService;
+    private readonly ITrainingHistoryService _historyService;
 
     [BindProperty] public int Fatigue { get; set; }
     [BindProperty] public int Experience { get; set; }
@@ -19,7 +17,7 @@ public class OptimizeModel : PageModel
     [BindProperty]
     public int? SelectedSplitId { get; set; }
 
-    public OptimizeModel(TrainingOptimizerService optimizerService, TrainingHistoryService historyService)
+    public OptimizeModel(ITrainingOptimizerService optimizerService, ITrainingHistoryService historyService)
     {
         _optimizerService = optimizerService;
         _historyService = historyService;

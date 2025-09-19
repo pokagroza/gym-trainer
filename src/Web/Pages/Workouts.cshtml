@@ -30,26 +30,13 @@ else
     <div class="grid-cards mb-4">
         @foreach(var split in Model.Splits)
         {
-            var diffClass = split.Difficulty == Domain.Entities.Difficulty.Easy ? "badge-easy" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "badge-medium" : "badge-hard");
-            var diffText = split.Difficulty == Domain.Entities.Difficulty.Easy ? "Лёгкий" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "Средний" : "Интенсивный");
-            <div class="workout-card custom-card">
-                <h5>@split.Name</h5>
-                <div class="mb-2"><span class="badge difficulty-badge @diffClass">@diffText</span></div>
-                <p class="muted">@split.Description</p>
-                <div class="mt-2 d-flex gap-2">
-                    @if (HttpContext.Session.GetInt32("UserId") == null)
-                    {
-                        <a class="btn btn-primary btn-sm btn-full" href="/Login">Войти чтобы выбрать</a>
-                    }
-                    else
-                    {
-                        <form method="post" class="w-100">
-                            <input type="hidden" name="splitId" value="@split.Id" />
-                            <button class="btn btn-success btn-sm btn-full" type="submit">Отметить тренировку</button>
-                        </form>
-                    }
-                </div>
-            </div>
+            @await Html.PartialAsync("~/Pages/Shared/_SplitCard.cshtml", new Web.Models.SplitCardModel {
+                Split = split,
+                ShowExercises = false,
+                ActionType = Web.Models.SplitCardActionType.MarkInHistory,
+                IsAuthenticated = HttpContext.Session.GetInt32("UserId") != null,
+                PostUrl = "/Workouts"
+            })
         }
     </div>
 }
