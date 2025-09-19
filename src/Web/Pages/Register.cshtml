@@ -1,0 +1,42 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Регистрация";
+}
+<div class="text-center mb-4">
+    <h2 class="mb-3"><span class="bi bi-person-plus me-2"></span>Регистрация</h2>
+</div>
+<form method="post" class="card p-4 mb-4 shadow-sm mx-auto custom-card" style="max-width: 500px;">
+    <div class="mb-3">
+        <label class="form-label">Логин:</label>
+        <input asp-for="Username" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Пароль:</label>
+        <input asp-for="Password" type="password" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Имя:</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Возраст:</label>
+        <input asp-for="Age" type="number" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Рост (см):</label>
+        <input asp-for="Height" type="number" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Вес (кг):</label>
+        <input asp-for="Weight" type="number" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success w-100"><span class="bi bi-person-check"></span> Зарегистрироваться</button>
+</form>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-danger">@Model.Message</div>
+}
+<div class="text-center mt-3">
+    <span>Уже есть аккаунт?</span> <a href="/Login">Войти</a>
+</div>

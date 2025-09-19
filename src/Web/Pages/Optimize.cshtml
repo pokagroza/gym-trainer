@@ -1,0 +1,76 @@
+@page
+@model OptimizeModel
+@{
+    ViewData["Title"] = "Оптимизация тренировки";
+}
+<div class="text-center mb-4">
+    <h2 class="mb-3"><span class="bi bi-graph-up-arrow me-2"></span>Оптимизация тренировки</h2>
+</div>
+@if (Model.HttpContext.Session.GetInt32("UserId") == null)
+{
+    <div class="alert alert-warning">Вы не авторизованы. <a href="/Login">Войти</a></div>
+}
+else
+{
+    <form method="post" class="card p-4 mb-4 shadow-sm mx-auto custom-card" style="max-width: 420px;" aria-label="Форма подбора тренировки">
+        <div class="mb-3 range-control">
+            <label class="form-label mb-0" for="fatigue-range"><span class="bi bi-battery-half me-1"></span>Усталость</label>
+            <input id="fatigue-range" asp-for="Fatigue" type="range" min="0" max="10" aria-valuemin="0" aria-valuemax="10" aria-label="Ползунок усталости" />
+            <span id="fatigue-value" class="badge bg-secondary">@Model.Fatigue</span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="experience-select"><span class="bi bi-award me-1"></span>Опыт</label>
+            <select id="experience-select" asp-for="Experience" class="form-select difficulty-select" aria-label="Выбор опыта">
+                <option value="0">Новичок</option>
+                <option value="1">1 год</option>
+                <option value="2">2 года</option>
+                <option value="3">3+ года</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="difficulty-select"><span class="bi bi-sliders me-1"></span>Сложность</label>
+            <select id="difficulty-select" asp-for="Difficulty" class="form-select difficulty-select" aria-label="Выбор желаемой сложности">
+                <option value="">(по умолчанию)</option>
+                <option value="easy">Лёгкий</option>
+                <option value="medium">Средний</option>
+                <option value="hard">Интенсивный</option>
+            </select>
+        </div>
+        <button class="btn btn-primary w-100" type="submit" aria-label="Подобрать тренировку"><span class="bi bi-lightning-charge"></span> Подобрать тренировку</button>
+    </form>
+    <script>
+        (function(){
+            const range = document.querySelector('input[type="range"][name="Fatigue"]');
+            const out = document.getElementById('fatigue-value');
+            if(range && out){
+                range.addEventListener('input', function(e){
+                    out.textContent = e.target.value;
+                });
+            }
+        })();
+    </script>
+    @if (Model.Suggestions?.Any() == true)
+    {
+        <div class="row g-3">
+            @foreach (var s in Model.Suggestions)
+            {
+                <div class="col-md-4">
+                    <div class="custom-card p-3">
+                        <h6 class="mb-1">@s.Name</h6>
+                        <p class="muted small">@s.Description</p>
+                        <ul class="small mb-2">
+                            @foreach (var ex in s.Exercises.Take(4))
+                            {
+                                <li>@ex.Exercise.Name — @ex.Sets x @ex.Reps</li>
+                            }
+                        </ul>
+                        <form method="post" asp-page-handler="Select">
+                            <input type="hidden" name="SelectedSplitId" value="@s.Id" />
+                            <button class="btn btn-outline-secondary btn-sm w-100" type="submit">Выбрать этот сплит</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}

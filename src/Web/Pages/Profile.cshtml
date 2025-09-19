@@ -1,0 +1,28 @@
+@page
+@model ProfileModel
+@{
+    ViewData["Title"] = "Профиль";
+}
+<div class="text-center mb-4">
+    <h2 class="mb-3"><span class="bi bi-person-circle me-2"></span>Профиль пользователя</h2>
+</div>
+@if (Model.User != null && Model.User.Id != 0)
+{
+    <div class="card shadow-lg p-4 mb-4 mx-auto custom-card" style="max-width: 420px;">
+        <h4 class="mb-3 text-primary"><span class="bi bi-person-fill"></span> @Model.User.Name</h4>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item"><strong>Возраст:</strong> @Model.User.Age</li>
+            <li class="list-group-item"><strong>Рост:</strong> @Model.User.Height см</li>
+            <li class="list-group-item"><strong>Вес:</strong> @Model.User.Weight кг</li>
+            <li class="list-group-item"><strong>Уровень усталости:</strong> @Model.User.FatigueLevel</li>
+        </ul>
+        <div class="d-flex gap-2 mt-3">
+            <a class="btn btn-outline-primary flex-fill" href="/History"><span class="bi bi-clock-history"></span> История</a>
+            <a class="btn btn-outline-success flex-fill" href="/Recommendations"><span class="bi bi-lightbulb"></span> Рекомендации</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">Вы не авторизованы. <a href="/Login">Войти</a></div>
+}

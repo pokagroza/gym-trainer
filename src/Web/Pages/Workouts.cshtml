@@ -1,0 +1,55 @@
+@page
+@model WorkoutsModel
+@{
+    ViewData["Title"] = "Готовые тренировки";
+}
+<div class="text-center mb-4 hero">
+    <h2 class="mb-1"><span class="bi bi-dumbbell me-2"></span>Готовые тренировки</h2>
+    <p class="lead muted">Найдите тренировку по уровню сложности и цели — просматривать можно без входа, чтобы выбрать нужно войти.</p>
+</div>
+
+<div class="mb-3 mx-auto" style="max-width:900px;">
+    <form method="get" class="d-flex gap-2" aria-label="Фильтр по сложности">
+        @{ var sel = (Request.Query["difficulty"].FirstOrDefault() ?? "all").ToString(); }
+        <select name="difficulty" class="form-select difficulty-select" aria-label="Выбор сложности">
+            <option value="all" selected="@(sel=="all")">Все уровни</option>
+            <option value="easy" selected="@(sel=="easy")">Лёгкие</option>
+            <option value="medium" selected="@(sel=="medium")">Средние</option>
+            <option value="hard" selected="@(sel=="hard")">Интенсивные</option>
+        </select>
+        <button class="btn btn-outline-primary" aria-label="Применить фильтр">Фильтровать</button>
+    </form>
+</div>
+
+@if (Model.Splits == null || !Model.Splits.Any())
+{
+    <div class="alert alert-info">Пока нет доступных тренировок.</div>
+}
+else
+{
+    <div class="grid-cards mb-4">
+        @foreach(var split in Model.Splits)
+        {
+            var diffClass = split.Difficulty == Domain.Entities.Difficulty.Easy ? "badge-easy" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "badge-medium" : "badge-hard");
+            var diffText = split.Difficulty == Domain.Entities.Difficulty.Easy ? "Лёгкий" : (split.Difficulty == Domain.Entities.Difficulty.Medium ? "Средний" : "Интенсивный");
+            <div class="workout-card custom-card">
+                <h5>@split.Name</h5>
+                <div class="mb-2"><span class="badge difficulty-badge @diffClass">@diffText</span></div>
+                <p class="muted">@split.Description</p>
+                <div class="mt-2 d-flex gap-2">
+                    @if (HttpContext.Session.GetInt32("UserId") == null)
+                    {
+                        <a class="btn btn-primary btn-sm btn-full" href="/Login">Войти чтобы выбрать</a>
+                    }
+                    else
+                    {
+                        <form method="post" class="w-100">
+                            <input type="hidden" name="splitId" value="@split.Id" />
+                            <button class="btn btn-success btn-sm btn-full" type="submit">Отметить тренировку</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
