@@ -1,0 +1,57 @@
+# ---- .NET build outputs ----
+[Bb]in/
+[Oo]bj/
+
+# VS / Rider / tooling
+*.user
+*.suo
+*.userprefs
+*.ide/
+*.rsuser
+.vs/
+.idea/
+*.swp
+*.sln.iml
+
+# Build artifacts / logs
+[Dd]ebug/
+[Rr]elease/
+*.log
+
+# Local databases / secrets
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Auto-generated files
+Generated*/
+
+# OS files
+[Dd]esktop.ini
+[Tt]humbs.db
+.DS_Store
+
+# Tools
+.env
+
+# Rider / JetBrains
+*.ipr
+*.iws
+.idea/
+
+# Coverage / test
+coverage/
+*.coverage
+*.coveragexml
+
+# Misc
+*.orig
+
+# Keep migrations (don't ignore)
+!src/Infrastructure/Migrations/
