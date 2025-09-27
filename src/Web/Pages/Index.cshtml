@@ -1,0 +1,50 @@
+@page "/"
+@model IndexModel
+@{
+    ViewData["Title"] = "Оптимизация тренировки";
+}
+<section class="hero py-5">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-start">
+                <h1 class="display-5 fw-bold">Добро пожаловать в Gym Trainer</h1>
+                <p class="lead mb-4">Персонализированные тренировки, быстрые рекомендации и прогресс-трекинг — всё в одном приложении, адаптированном под ваш уровень и усталость.</p>
+                <div class="d-flex gap-2 mb-3">
+                    <a class="btn btn-primary btn-lg" href="/Optimize">Подобрать тренировку</a>
+                    <a class="btn btn-outline-secondary btn-lg" href="/Workouts">Готовые тренировки</a>
+                </div>
+                <p class="muted">Быстро. Научно. Практично.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="custom-card p-4 shadow-sm">
+                    <h5 class="mb-2">Как это работает</h5>
+                    <ol class="mb-0">
+                        <li>Укажите уровень усталости и опыта.</li>
+                        <li>Получите адаптированный сплит с набором упражнений и подходов.</li>
+                        <li>Отслеживайте прогресс и получайте рекомендации.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="custom-card p-3 text-center">
+                    <h6>Подбор тренировки</h6>
+                    <p class="muted">Адаптация под усталость и опыт.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="custom-card p-3 text-center">
+                    <h6>Готовые сплиты</h6>
+                    <p class="muted">Выберите из множества готовых программ.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="custom-card p-3 text-center">
+                    <h6>Рекомендации</h6>
+                    <p class="muted">Упражнения для баланса и восстановления.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
